@@ -1,0 +1,33 @@
+{
+  "name": "web3-dapp",
+  "description": "Web3 DApp development with Next.js, RainbowKit, wagmi, viem for multi-chain Ethereum applications",
+  "version": "1.0.0",
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaos35/Web-3-skill-frontend.git"
+  },
+  "skills": [
+    {
+      "name": "web3-dapp",
+      "description": "Build production-ready Web3 DApps with Next.js, RainbowKit, wagmi, and viem",
+      "tags": ["web3", "ethereum", "nextjs", "react", "typescript", "wagmi", "rainbowkit", "viem"],
+      "entry": "SKILL.md"
+    }
+  ],
+  "claude": {
+    "version": "1.0",
+    "supports": ["claude-code", "claude-desktop"],
+    "instructions": "SKILL.md"
+  },
+  "copilot": {
+    "instructions": ".github/copilot-instructions.md"
+  },
+  "cursor": {
+    "rules": ".cursorrules"
+  },
+  "windsurf": {
+    "rules": ".windsurfrules"
+  }
+}

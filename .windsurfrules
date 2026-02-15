@@ -1,0 +1,209 @@
+# Web3 DApp Development Rules for Windsurf
+
+## Role
+
+You are an expert Web3 frontend developer specializing in Next.js, RainbowKit, wagmi, and viem.
+
+## Project Type
+
+This is a Web3 decentralized application (DApp) built with modern React and Ethereum technologies.
+
+## Technology Stack
+
+- **Framework**: Next.js 14+ with App Router
+- **Web3**: wagmi 2.x + viem 2.x + RainbowKit 2.x
+- **Language**: TypeScript 5.x (strict mode enabled)
+- **Styling**: Tailwind CSS 3.4+
+- **UI Library**: shadcn/ui (Radix UI primitives)
+- **State**: TanStack Query (React Query)
+- **Icons**: Lucide React
+
+## Absolute Rules
+
+### 1. Client Components for Web3
+- Every component using wagmi hooks MUST start with `'use client'`
+- Never use wagmi hooks in server components
+- This is non-negotiable
+
+### 2. Hook Positioning
+- Call ALL hooks at component top level
+- Never call hooks in callbacks, loops, or conditionals
+- Never call hooks inside useEffect or other hooks
+
+### 3. Security
+- Never expose private keys in frontend code
+- Never hardcode sensitive API keys
+- Never store sensitive data in localStorage
+- Always validate inputs before contract calls
+
+## File Structure
+
+```
+src/
+├── app/                    # Next.js routes
+│   ├── layout.tsx         # Root layout
+│   ├── page.tsx           # Landing page
+│   ├── providers.tsx      # Wagmi + RainbowKit config
+│   ├── globals.css        # Global styles
+│   ├── dashboard/
+│   ├── nfts/
+│   └── swap/
+├── components/
+│   ├── ui/               # shadcn components
+│   ├── connect-button.tsx
+│   ├── nft-card.tsx
+│   └── nft-grid.tsx
+├── hooks/
+│   ├── use-contract.ts
+│   ├── use-nfts.ts
+│   └── use-token-balance.ts
+├── lib/
+│   ├── utils.ts
+│   └── contracts.ts
+└── types/
+    ├── nft.ts
+    └── token.ts
+```
+
+## Code Templates
+
+### Provider Setup
+
+```typescript
+'use client';
+
+import { RainbowKitProvider, getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { WagmiProvider } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { mainnet, polygon, arbitrum, base, bsc, avalanche } from 'wagmi/chains';
+
+const config = getDefaultConfig({
+  appName: 'Web3 DApp',
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
+  chains: [mainnet, polygon, arbitrum, base, bsc, avalanche],
+  ssr: true,
+});
+
+const queryClient = new QueryClient();
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider>{children}</RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  );
+}
+```
+
+### Contract Read Hook
+
+```typescript
+'use client';
+
+import { useReadContract } from 'wagmi';
+import { Abi, Address } from 'viem';
+
+export function useContractRead<TAbi extends Abi>({
+  address,
+  abi,
+  functionName,
+  args,
+  enabled = true,
+}: {
+  address: Address;
+  abi: TAbi;
+  functionName: string;
+  args?: unknown[];
+  enabled?: boolean;
+}) {
+  return useReadContract({
+    address,
+    abi,
+    functionName,
+    args,
+    query: { enabled },
+  });
+}
+```
+
+### Wallet Button
+
+```typescript
+'use client';
+
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+
+export function WalletButton() {
+  return (
+    <ConnectButton.Custom>
+      {({ account, chain, openConnectModal, mounted }) => {
+        if (!mounted) return null;
+        if (!account) {
+          return <button onClick={openConnectModal}>Connect</button>;
+        }
+        return (
+          <div>
+            <span>{chain?.name}</span>
+            <span>{account.displayName}</span>
+          </div>
+        );
+      }}
+    </ConnectButton.Custom>
+  );
+}
+```
+
+## Dependencies
+
+Always include:
+```bash
+npm install wagmi viem @rainbow-me/rainbowkit @tanstack/react-query lucide-react
+```
+
+## Environment Variables
+
+Required in `.env.local`:
+```env
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=your_project_id_here
+```
+
+Optional:
+```env
+NEXT_PUBLIC_ALCHEMY_API_KEY=your_key
+NEXT_PUBLIC_INFURA_API_KEY=your_key
+```
+
+## Styling
+
+- Use Tailwind CSS exclusively
+- Follow shadcn/ui patterns
+- Mobile-first responsive design
+- Support dark mode with `dark:` prefix
+
+## Error Handling
+
+Always:
+1. Show loading states
+2. Handle errors gracefully
+3. Use try-catch for async operations
+4. Display user-friendly error messages
+
+## Before Generating Code
+
+1. Check existing project structure
+2. Verify providers.tsx exists
+3. Confirm .env.local has required variables
+4. Follow established patterns
+5. Use TypeScript strict types
+
+## Quality Checklist
+
+- [ ] 'use client' on Web3 components
+- [ ] Hooks at top level only
+- [ ] Proper TypeScript types
+- [ ] Error handling implemented
+- [ ] Loading states added
+- [ ] Responsive design
+- [ ] No hardcoded secrets
